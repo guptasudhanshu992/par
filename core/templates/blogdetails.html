@@ -1,0 +1,770 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ blog.title }}{% endblock %}
+{% block description %}{{ blog.seo_description|default:"Explore our latest insights on trading and market analysis" }}{% endblock %}
+{% block keywords %}{{ blog.seo_keywords|default:"trading, crypto, price action, market analysis" }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Blog Detail Styles */
+    .hero-section {
+        position: relative;
+        height: 70vh;
+        min-height: 500px;
+        overflow: hidden;
+        margin-bottom: 3rem;
+    }
+    
+    .hero-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 6s ease;
+    }
+    
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+    }
+    
+    .hero-content {
+        position: relative;
+        max-width: 800px;
+        margin: 0 auto;
+        padding-top: 12vh;
+        text-align: center;
+        animation: fadeInDown 0.8s ease-out;
+        color: #fff;
+    }
+    
+    .category-badge {
+        display: inline-block;
+        background: #fff;
+        padding: 6px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        color: #000;
+    }
+    
+    .blog-title {
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin-bottom: 1.5rem;
+        font-size: 2.5rem;
+        line-height: 1.2;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .meta-info {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+        color: rgba(255,255,255,0.9);
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+    }
+    
+    /* Layout for content and ads */
+    .content-wrapper {
+        display: flex;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+    
+    .article-container {
+        flex: 1;
+        max-width: 800px;
+        margin-right: 2rem;
+    }
+    
+    .ad-sidebar {
+        width: 300px;
+        position: sticky;
+        top: 2rem;
+        align-self: flex-start;
+    }
+    
+    /* Article Content */
+    .article-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #333;
+    }
+    
+    .article-content h2 {
+        font-size: 1.8rem;
+        margin-top: 3rem;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .article-content h2::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background-color: #000;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.8rem;
+    }
+    
+    .article-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 2rem 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        filter: grayscale(100%);
+    }
+    
+    .article-content blockquote {
+        border-left: 4px solid #000;
+        padding-left: 1.5rem;
+        margin: 2rem 0;
+        font-style: italic;
+        font-size: 1.3rem;
+        color: #444;
+    }
+    
+    /* Tags Section */
+    .tags-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 3rem 0;
+        padding-top: 2rem;
+        border-top: 1px solid #eee;
+    }
+    
+    .tag-pill {
+        background-color: #f0f0f0;
+        color: #333;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .tag-pill:hover {
+        background-color: #000;
+        color: #fff;
+    }
+    
+    /* Share Section */
+    .share-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin: 3rem 0;
+        padding-top: 2rem;
+        border-top: 1px solid #eee;
+    }
+    
+    .share-title {
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    
+    .share-button {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        border: 1px solid #eee;
+        color: #333;
+        transition: all 0.3s ease;
+		text-decoration: none;
+    }
+    
+    .share-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .share-button.whatsapp:hover { background: #25D366; color: white; }
+    .share-button.facebook:hover { background: #3b5998; color: white; }
+    .share-button.instagram:hover { background: #E1306C; color: white; }
+    .share-button.reddit:hover { background: #FF4500; color: white; }
+    
+    /* Advertisement Sections */
+    .ad-space {
+        background: #f8f8f8;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        animation: fadeIn 0.8s ease-out;
+    }
+    
+    .ad-space h3 {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        color: #777;
+    }
+    
+    .ad-space .ad-content {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        border-radius: 4px;
+        color: #ccc;
+        font-size: 1rem;
+    }
+    
+    .vertical-ad .ad-content {
+        height: 600px;
+    }
+    
+    .horizontal-ad .ad-content {
+        height: 150px;
+    }
+    
+    /* Sticky Bottom Ad */
+    .bottom-ad-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(255,255,255,0.95);
+        border-top: 1px solid #eee;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transform: translateY(0);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+    }
+    
+    .bottom-ad-container.hidden {
+        transform: translateY(100%);
+    }
+    
+    .bottom-ad-content {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+    
+    .ad-text {
+        flex: 1;
+        padding-right: 20px;
+    }
+    
+    .ad-text h4 {
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+    
+    .ad-text p {
+        font-size: 0.9rem;
+        color: #666;
+        margin: 0;
+    }
+    
+    .ad-close-btn {
+        background: none;
+        border: none;
+        color: #999;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+    
+    .ad-close-btn:hover {
+        color: #000;
+    }
+    
+    /* Related Articles */
+    .related-section {
+        padding: 4rem 1rem;
+        background: #f8f8f8;
+        margin-top: 3rem;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background-color: #000;
+    }
+    
+    .related-card {
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    
+    .related-card.visible {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .related-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .related-img {
+        height: 180px;
+        object-fit: cover;
+        width: 100%;
+        filter: grayscale(100%);
+    }
+    
+    .related-body {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .related-title {
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        font-size: 1.2rem;
+    }
+    
+    .related-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+    
+    /* Animations */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 1200px) {
+        .content-wrapper {
+            flex-direction: column;
+        }
+        
+        .article-container {
+            margin-right: 0;
+            max-width: 100%;
+        }
+        
+        .ad-sidebar {
+            width: 100%;
+            position: static;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 2rem;
+        }
+        
+        .vertical-ad {
+            flex: 1;
+            min-width: 300px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .hero-section {
+            height: 60vh;
+        }
+        
+        .blog-title {
+            font-size: 2rem;
+        }
+        
+        .article-content h2 {
+            font-size: 1.6rem;
+        }
+        
+        .meta-info {
+            gap: 1rem;
+        }
+        
+        .bottom-ad-content {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .ad-text {
+            padding-right: 0;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    {% if blog.cover_image %}
+    <img 
+        src="{{ blog.cover_image.file.url }}" 
+        alt="{{ blog.title }}" 
+        class="hero-image lazy"
+        loading="lazy"
+    >
+    {% else %}
+    <div class="hero-image" style="background-color: #222;"></div>
+    {% endif %}
+    
+    <div class="hero-overlay"></div>
+    
+    <div class="hero-content">
+        {% if blog.categories.exists %}
+			{% for category in blog.categories.all %}
+				<div class="category-badge">
+					{{ category.name }}
+				</div>
+			{% endfor %}
+        {% endif %}
+        
+        <h1 class="blog-title">{{ blog.title }}</h1>
+        
+        <div class="meta-info">
+            <div class="meta-item">
+                <i class="fas fa-user"></i>
+                <span>
+                    {% if blog.author.get_full_name %}
+                        {{ blog.author.get_full_name }}
+                    {% else %}
+                        {{ blog.author.username }}
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="meta-item">
+                <i class="fas fa-calendar"></i>
+                <span>{{ blog.published_at|date:"F j, Y" }}</span>
+            </div>
+            
+            <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <span>{{ blog.reading_time }} min read</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content Area -->
+<div class="content-wrapper">
+    <!-- Article Content -->
+    <article class="article-container">
+        <div class="article-content">
+            {{ blog.content|safe }}
+        </div>
+        
+        <!-- Tags Section -->
+        {% if blog.tags.exists %}
+        <div class="tags-section">
+            <span class="me-2"><i class="fas fa-tags"></i> Tags:</span>
+            {% for tag in blog.tags.all %}
+            <a href="#" class="tag-pill">#{{ tag.name }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Share Section -->
+        <div class="share-section">
+            <div class="share-title">
+                <i class="fas fa-share-alt me-2"></i> Share this article:
+            </div>
+            <a href="https://wa.me/?text=Check%20out%20this%20article:%20{{ blog.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" 
+               class="share-button whatsapp" target="_blank" aria-label="Share on WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+               class="share-button facebook" target="_blank" aria-label="Share on Facebook">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://www.instagram.com/?url={{ request.build_absolute_uri }}" 
+               class="share-button instagram" target="_blank" aria-label="Share on Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://www.reddit.com/submit?url={{ request.build_absolute_uri }}&title={{ blog.title|urlencode }}" 
+               class="share-button reddit" target="_blank" aria-label="Share on Reddit">
+                <i class="fab fa-reddit-alien"></i>
+            </a>
+        </div>
+        
+        <!-- Horizontal Advertisement -->
+        <div class="ad-space horizontal-ad">
+            <h3>Advertisement</h3>
+            <div class="ad-content">
+                Horizontal Ad (728 × 150)
+            </div>
+        </div>
+    </article>
+    
+    <!-- Vertical Advertisement Sidebar -->
+    <aside class="ad-sidebar">
+        <div class="ad-space vertical-ad">
+            <h3>Sponsored Content</h3>
+            <div class="ad-content">
+                Vertical Ad (300 × 600)
+            </div>
+        </div>
+        
+        <div class="ad-space">
+            <h3>Recommended Tools</h3>
+            <div class="ad-content" style="height: 300px;">
+                Recommended Ad (300 × 300)
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- Sticky Bottom Ad -->
+<div class="bottom-ad-container" id="bottomAd">
+    <div class="bottom-ad-content">
+        <div class="ad-text">
+            <h4>Special Offer Just For You</h4>
+            <p>Get 20% off on our premium trading tools - limited time offer!</p>
+        </div>
+        <div class="ad-content" style="width: 120px; height: 60px; background: #fff; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; color: #ccc;">
+            Ad
+        </div>
+        <button class="ad-close-btn" id="closeAdBtn">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Related Articles Section -->
+<section class="related-section">
+    <div class="container">
+        <h2 class="section-title">Related Articles</h2>
+        
+        <div class="row g-4">
+            {% for related in related_blogs %}
+            <div class="col-lg-4 col-md-6">
+                <a href="#" class="text-decoration-none text-dark">
+                    <article class="related-card">
+                        {% if related.cover_image %}
+                        <img 
+                            src="{{ related.cover_image.url }}" 
+                            alt="{{ related.title }}" 
+                            class="related-img lazy"
+                            loading="lazy"
+                        >
+                        {% else %}
+                        <div class="related-img" style="background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #ccc;">
+                            No Image
+                        </div>
+                        {% endif %}
+                        
+                        <div class="related-body">
+                            <h3 class="related-title">{{ related.title }}</h3>
+                            
+                            <div class="related-meta">
+                                <div>
+                                    <i class="fas fa-tag me-1"></i>
+                                    {% if related.categories.exists %}
+                                        {{ related.categories.first.name }}
+                                    {% else %}
+                                        General
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ related.reading_time }} min
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-3">
+                <p>No related articles at this time</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lazy load images
+        const lazyImages = [].slice.call(document.querySelectorAll('.lazy'));
+        
+        if ('IntersectionObserver' in window) {
+            const lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        const lazyImage = entry.target;
+                        if (lazyImage.tagName === 'IMG') {
+                            lazyImage.src = lazyImage.src;
+                        }
+                        lazyImage.classList.add('loaded');
+                        lazyImageObserver.unobserve(lazyImage);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px 100px 0px'
+            });
+            
+            lazyImages.forEach(function(lazyImage) {
+                lazyImageObserver.observe(lazyImage);
+            });
+        } else {
+            lazyImages.forEach(function(lazyImage) {
+                if (lazyImage.tagName === 'IMG') {
+                    lazyImage.src = lazyImage.src;
+                }
+            });
+        }
+        
+        // Scroll animations for related articles
+        const relatedCards = document.querySelectorAll('.related-card');
+        let delay = 0;
+        
+        const animateOnScroll = () => {
+            relatedCards.forEach(card => {
+                const cardPosition = card.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.2;
+                
+                if(cardPosition < screenPosition && !card.classList.contains('visible')) {
+                    card.style.animationDelay = `${delay}s`;
+                    card.classList.add('visible');
+                    delay += 0.1;
+                }
+            });
+        };
+        
+        // Initial check
+        animateOnScroll();
+        
+        // Check on scroll
+        window.addEventListener('scroll', animateOnScroll);
+        
+        // Tag hover effect
+        const tagPills = document.querySelectorAll('.tag-pill');
+        tagPills.forEach(tag => {
+            tag.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+            });
+            
+            tag.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+        
+        // Hero image parallax effect
+        const heroImage = document.querySelector('.hero-image');
+        if (heroImage) {
+            window.addEventListener('scroll', function() {
+                const scrollPosition = window.pageYOffset;
+                //heroImage.style.transform = `translateY(${scrollPosition * 0.5}px)`;
+            });
+        }
+        
+        // Bottom ad functionality
+        const bottomAd = document.getElementById('bottomAd');
+        const closeAdBtn = document.getElementById('closeAdBtn');
+        
+        // Check if user has previously closed the ad
+        if (!localStorage.getItem('adClosed')) {
+            bottomAd.classList.remove('hidden');
+        }
+        
+        // Close ad button
+        closeAdBtn.addEventListener('click', function() {
+            bottomAd.classList.add('hidden');
+            localStorage.setItem('adClosed', 'true');
+        });
+        
+        // Share button hover effects
+        const shareButtons = document.querySelectorAll('.share-button');
+        shareButtons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
+{% endblock %}
