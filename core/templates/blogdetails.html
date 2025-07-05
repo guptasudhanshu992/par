@@ -6,6 +6,21 @@
 {% block keywords %}{{ blog.seo_keywords|default:"trading, crypto, price action, market analysis" }}{% endblock %}
 
 {% block content %}
+<script src="https://cmp.gatekeeperconsent.com/min.js" data-cfasync="false"></script>
+<script src="https://the.gatekeeperconsent.com/cmp.min.js" data-cfasync="false"></script>
+<script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
+<script>
+    window.ezstandalone = window.ezstandalone || {};
+    ezstandalone.cmd = ezstandalone.cmd || [];
+    ezstandalone.cmd.push(function () {
+        ezstandalone.showAds(102);
+		ezstandalone.showAds(103);
+		ezstandalone.showAds(107);
+		ezstandalone.showAds(108);
+    });
+</script>
+
+
 <style>
     /* Blog Detail Styles */
     .hero-section {
@@ -567,9 +582,7 @@
         <!-- Horizontal Advertisement -->
         <div class="ad-space horizontal-ad">
             <h3>Advertisement</h3>
-            <div class="ad-content">
-                Horizontal Ad (728 × 150)
-            </div>
+            <div id="ezoic-pub-ad-placeholder-102"></div>
         </div>
     </article>
     
@@ -577,16 +590,12 @@
     <aside class="ad-sidebar">
         <div class="ad-space vertical-ad">
             <h3>Sponsored Content</h3>
-            <div class="ad-content">
-                Vertical Ad (300 × 600)
-            </div>
+			<div id="ezoic-pub-ad-placeholder-107"></div>
         </div>
         
         <div class="ad-space">
             <h3>Recommended Tools</h3>
-            <div class="ad-content" style="height: 300px;">
-                Recommended Ad (300 × 300)
-            </div>
+            <div id="ezoic-pub-ad-placeholder-108"></div>
         </div>
     </aside>
 </div>
@@ -594,13 +603,7 @@
 <!-- Sticky Bottom Ad -->
 <div class="bottom-ad-container" id="bottomAd">
     <div class="bottom-ad-content">
-        <div class="ad-text">
-            <h4>Special Offer Just For You</h4>
-            <p>Get 20% off on our premium trading tools - limited time offer!</p>
-        </div>
-        <div class="ad-content" style="width: 120px; height: 60px; background: #fff; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; color: #ccc;">
-            Ad
-        </div>
+		<div id="ezoic-pub-ad-placeholder-103"></div>
         <button class="ad-close-btn" id="closeAdBtn">
             <i class="fas fa-times"></i>
         </button>
